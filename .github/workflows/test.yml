@@ -1,0 +1,41 @@
+name: Test Link 4K Slideshow Maker
+
+on:
+  schedule:
+    - cron: "0 12 * * *"
+
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install links package
+        run: sudo apt install links
+
+      - name: Test downloads link for 4kdownload
+        run: wget --server-response --spider --quiet "https://www.4kdownload.com/downloads"
+
+      - name: Search version for 4K Slideshow Maker
+        run: |
+          link="https://www.4kdownload.com/downloads"
+          version="$(grep -Eom1 "([0-9]+[.]){2}[0-9]+" <(grep -A5 "    4K Slideshow Maker" <(links -dump "$link")))"
+          printf "latest version: $version \n" >> $GITHUB_STEP_SUMMARY
+      - name: Test download link for 4K Video Downloader
+        run: |
+          link="https://www.4kdownload.com/downloads"
+          version="$(grep -Eom1 "([0-9]+[.]){2}[0-9]+" <(grep -A5 "    4K Slideshow Maker" <(links -dump "$link")))"
+          wget --server-response --spider --quiet "https://dl.4kdownload.com/app/4kslideshowmaker_${version}_amd64.tar.bz2"
+      - name: Check icon link
+        run: wget --server-response --spider --quiet "https://static.4kdownload.com/main/img/redesign/slideshowmaker.c32d251fe348.svg"
+
+      - name: Check appimagetool link
+        run: wget --server-response --spider --quiet "https://github.com/AppImage/AppImageKit/releases/download/13/appimagetool-x86_64.AppImage"
